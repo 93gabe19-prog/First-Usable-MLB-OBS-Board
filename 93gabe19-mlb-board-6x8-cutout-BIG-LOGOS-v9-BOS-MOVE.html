@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>93GABE19 MLB Team Board - 6x8</title>
+<style>
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#080c12;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+.board{
+  width:100vw;
+  height:100vh;
+  padding:0 18px 18px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-template-rows:220px repeat(8,1fr);
+  gap:7px;
+}
+
+/* Same baseball-themed banner */
+.header{
+  grid-column:1 / -1;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 50% 45%, #26384c 0%, #121c28 48%, #080c12 100%);
+  border-bottom:2px solid #344354;
+}
+
+.header::before,
+.header::after{
+  content:"";
+  position:absolute;
+  width:420px;
+  height:290px;
+  border:5px solid #d71920;
+  border-radius:50%;
+  opacity:.9;
+  box-shadow:0 0 0 2px rgba(255,255,255,.15);
+}
+
+.header::before{
+  left:-105px;
+  top:-90px;
+  transform:rotate(18deg);
+}
+
+.header::after{
+  right:-105px;
+  bottom:-90px;
+  transform:rotate(18deg);
+}
+
+.stitches{
+  position:absolute;
+  width:150%;
+  height:150%;
+  left:-25%;
+  top:-25%;
+  pointer-events:none;
+  opacity:.8;
+  background:
+    repeating-linear-gradient(
+      72deg,
+      transparent 0 26px,
+      rgba(255,255,255,.9) 27px 30px,
+      transparent 31px 48px
+    );
+  -webkit-mask:
+    radial-gradient(ellipse at center, transparent 35%, #000 36% 64%, transparent 65%);
+  mask:
+    radial-gradient(ellipse at center, transparent 35%, #000 36% 64%, transparent 65%);
+}
+
+.brand{
+  position:relative;
+  z-index:3;
+  text-align:center;
+  color:white;
+  text-shadow:0 3px 12px rgba(0,0,0,.8);
+}
+
+.brand .small{
+  font-size:18px;
+  font-weight:800;
+  letter-spacing:5px;
+  color:#d71920;
+  margin-bottom:2px;
+}
+
+.brand .name{
+  font-size:72px;
+  line-height:.9;
+  font-weight:950;
+  font-style:italic;
+  letter-spacing:-4px;
+  color:#fff;
+  -webkit-text-stroke:2px #0b2747;
+  text-shadow:
+    0 4px 0 #d71920,
+    0 7px 16px rgba(0,0,0,.65);
+}
+
+.brand .sub{
+  margin-top:10px;
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:4px;
+  color:#dfe7ef;
+}
+
+/* Team cells */
+.team{
+  position:relative;
+  min-width:0;
+  min-height:0;
+  border:1px solid #303a47;
+  border-radius:7px;
+  background:linear-gradient(145deg,#202a36,#151d27);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  user-select:none;
+  overflow:hidden;
+}
+
+.team img{
+  width:86%;
+  height:94%;
+  object-fit:contain;
+  filter:
+    drop-shadow(0 0 5px rgba(255,255,255,.55))
+    drop-shadow(0 0 11px rgba(255,255,255,.18));
+  transform:scale(1.18);
+  transition:transform .15s ease,opacity .15s ease,filter .15s ease;
+}
+
+.team:hover img{
+  transform:scale(1.24);
+  filter:
+    drop-shadow(0 0 7px rgba(255,255,255,.7))
+    drop-shadow(0 0 15px rgba(255,255,255,.22));
+}
+
+/* Taken = red X + readable team name */
+.team.taken::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(45deg, transparent 47%, #e21b2d 48%, #e21b2d 52%, transparent 53%),
+    linear-gradient(-45deg, transparent 47%, #e21b2d 48%, #e21b2d 52%, transparent 53%);
+  pointer-events:none;
+  z-index:2;
+}
+
+.team.taken::before{
+  content:attr(data-name);
+  position:absolute;
+  z-index:3;
+  left:5%;
+  right:5%;
+  top:50%;
+  transform:translateY(-50%);
+  text-align:center;
+  color:#fff;
+  font-size:clamp(10px, 1.15vw, 20px);
+  line-height:1.05;
+  font-weight:900;
+  letter-spacing:.2px;
+  text-shadow:0 2px 4px rgba(0,0,0,.95),0 0 7px rgba(0,0,0,.95);
+  pointer-events:none;
+}
+
+.team.taken img{
+  opacity:.22;
+  filter:grayscale(1) brightness(.65);
+}
+
+/* Five intentional gray cutout cells:
+   row 3 column 1; rows 4-5 columns 1-2.
+   These are left empty for the Whatnot purchase overlay. */
+.cutout{
+  background:linear-gradient(145deg,#202a36,#151d27);
+  border:1px solid #303a47;
+  border-radius:7px;
+  cursor:default;
+}
+
+@media(max-width:700px){
+  .board{
+    padding:0 8px 8px;
+    gap:5px;
+    grid-template-rows:180px repeat(8,1fr);
+  }
+  .brand .name{font-size:48px}
+  .brand .small{font-size:12px;letter-spacing:3px}
+  .brand .sub{font-size:10px;letter-spacing:2px}
+  .team{border-radius:5px}
+  .team img{
+    width:94%;
+    height:97%;
+    transform:scale(1.18);
+  }
+}
+</style>
+</head>
+<body>
+<div class="board" id="board">
+  <div class="header">
+    <div class="stitches"></div>
+    <div class="brand">
+      <div class="small">BASEBALL BREAKS</div>
+      <div class="name">93GABE19</div>
+      <div class="sub">MLB TEAM BOARD</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const teams = [
+  ["SEA","https://a.espncdn.com/i/teamlogos/mlb/500/sea.png"],
+  ["HOU","https://a.espncdn.com/i/teamlogos/mlb/500/hou.png"],
+  ["TEX","https://a.espncdn.com/i/teamlogos/mlb/500/tex.png"],
+  ["OAK","https://a.espncdn.com/i/teamlogos/mlb/500/oak.png"],
+  ["LAA","https://a.espncdn.com/i/teamlogos/mlb/500/laa.png"],
+
+  ["CLE","https://a.espncdn.com/i/teamlogos/mlb/500/cle.png"],
+  ["DET","https://a.espncdn.com/i/teamlogos/mlb/500/det.png"],
+  ["KC","https://a.espncdn.com/i/teamlogos/mlb/500/kc.png"],
+  ["MIN","https://a.espncdn.com/i/teamlogos/mlb/500/min.png"],
+  ["CWS","https://a.espncdn.com/i/teamlogos/mlb/500/chw.png"],
+
+  ["NYY","https://a.espncdn.com/i/teamlogos/mlb/500/nyy.png"],
+  ["BAL","https://a.espncdn.com/i/teamlogos/mlb/500/bal.png"],
+  ["BOS","https://a.espncdn.com/i/teamlogos/mlb/500/bos.png"],
+  ["TB","https://a.espncdn.com/i/teamlogos/mlb/500/tb.png"],
+  ["TOR","https://a.espncdn.com/i/teamlogos/mlb/500/tor.png"],
+
+  ["LAD","https://a.espncdn.com/i/teamlogos/mlb/500/lad.png"],
+  ["SD","https://a.espncdn.com/i/teamlogos/mlb/500/sd.png"],
+  ["SF","https://a.espncdn.com/i/teamlogos/mlb/500/sf.png"],
+  ["ARI","https://a.espncdn.com/i/teamlogos/mlb/500/ari.png"],
+  ["COL","https://a.espncdn.com/i/teamlogos/mlb/500/col.png"],
+
+  ["CHC","https://a.espncdn.com/i/teamlogos/mlb/500/chc.png"],
+  ["MIL","https://a.espncdn.com/i/teamlogos/mlb/500/mil.png"],
+  ["STL","https://a.espncdn.com/i/teamlogos/mlb/500/stl.png"],
+  ["CIN","https://a.espncdn.com/i/teamlogos/mlb/500/cin.png"],
+  ["PIT","https://a.espncdn.com/i/teamlogos/mlb/500/pit.png"],
+
+  ["ATL","https://a.espncdn.com/i/teamlogos/mlb/500/atl.png"],
+  ["PHI","https://a.espncdn.com/i/teamlogos/mlb/500/phi.png"],
+  ["NYM","https://a.espncdn.com/i/teamlogos/mlb/500/nym.png"],
+  ["MIA","https://a.espncdn.com/i/teamlogos/mlb/500/mia.png"],
+  ["WSH","https://a.espncdn.com/i/teamlogos/mlb/500/wsh.png"]
+];
+
+const teamNames = {
+  SEA:"Seattle Mariners", HOU:"Houston Astros", TEX:"Texas Rangers", OAK:"Athletics", LAA:"Los Angeles Angels",
+  CLE:"Cleveland Guardians", DET:"Detroit Tigers", KC:"Kansas City Royals", MIN:"Minnesota Twins", CWS:"Chicago White Sox",
+  NYY:"New York Yankees", BAL:"Baltimore Orioles", BOS:"Boston Red Sox", TB:"Tampa Bay Rays", TOR:"Toronto Blue Jays",
+  LAD:"Los Angeles Dodgers", SD:"San Diego Padres", SF:"San Francisco Giants", ARI:"Arizona Diamondbacks", COL:"Colorado Rockies",
+  CHC:"Chicago Cubs", MIL:"Milwaukee Brewers", STL:"St. Louis Cardinals", CIN:"Cincinnati Reds", PIT:"Pittsburgh Pirates",
+  ATL:"Atlanta Braves", PHI:"Philadelphia Phillies", NYM:"New York Mets", MIA:"Miami Marlins", WSH:"Washington Nationals"
+};
+
+/*
+  6 columns x 8 rows.
+  Column 1 and column 6 are buffer/cutout cells so the
+  Whatnot UI does not clip the outer edges on phones.
+  Rows 1-4: 4 teams each
+  Row 5: 2 teams (large intentional cutout area)
+  Rows 6-8: 4 teams each
+  Total: 30 teams + 18 non-team cells
+*/
+
+const layout = [
+  "cutout",0,1,2,3,"cutout",
+  "cutout",4,5,6,7,"cutout",
+  "cutout",8,9,10,11,"cutout",
+  "cutout","cutout",13,14,15,"cutout",
+  "cutout","cutout",12,16,17,"cutout",
+  "cutout",18,19,20,21,"cutout",
+  "cutout",22,23,24,25,"cutout",
+  "cutout",26,27,28,29,"cutout"
+];
+
+layout.forEach(item=>{
+  if(item === "cutout"){
+    const blank=document.createElement("div");
+    blank.className="cutout";
+    board.appendChild(blank);
+    return;
+  }
+
+  const [abbr,logo]=teams[item];
+  const team=document.createElement("div");
+  team.className="team";
+  team.title=teamNames[abbr];
+  team.dataset.name=teamNames[abbr];
+  team.innerHTML=`<img src="${logo}" alt="${teamNames[abbr]}">`;
+  team.addEventListener("click",()=>team.classList.toggle("taken"));
+  board.appendChild(team);
+});
+</script>
+</body>
+</html>
